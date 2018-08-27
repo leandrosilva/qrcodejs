@@ -275,6 +275,8 @@ var QRCode;
 	})() : (function () { // Drawing in Canvas
 		function _onMakeImage() {
 			this._elImage.src = this._elCanvas.toDataURL("image/png");
+			this._elImage.height = this._htOption.height / this._htOption.qualityRatio;
+			this._elImage.width = this._htOption.width / this._htOption.qualityRatio;
 			this._elImage.style.display = "block";
 			this._elCanvas.style.display = "none";
 		}
@@ -545,9 +547,10 @@ var QRCode;
 			colorLight : "#ffffff",
 			correctLevel : QRErrorCorrectLevel.H,
 			border: 0,
+			qualityRatio: 1,
 			hasBg: true
 		};
-
+		
 		if (typeof vOption === 'string') {
 			vOption	= {
 				text : vOption
@@ -560,6 +563,11 @@ var QRCode;
 				this._htOption[i] = vOption[i];
 			}
 		}
+
+		// Apply image quality ratio, e.g. 300 DPI to 300 DPI = 1; 96 DPI to 300 DPI = 3.125
+		// So we build a bigger canvas than the image we show of exactly height/width defined on option
+		this._htOption.height = this._htOption.height * this._htOption.qualityRatio;
+		this._htOption.width = this._htOption.width * this._htOption.qualityRatio;
 
 		if (typeof el == "string") {
 			el = document.getElementById(el);
