@@ -19,6 +19,7 @@ var qrcode = new QRCode(document.getElementById("qrcode"), {
 	text: "http://jindo.dev.naver.com/collie",
 	width: 128,
 	height: 128,
+	boder: 1,
 	colorDark : "#000000",
 	colorLight : "#ffffff",
 	correctLevel : QRCode.CorrectLevel.H
@@ -27,13 +28,10 @@ var qrcode = new QRCode(document.getElementById("qrcode"), {
 ```
 Available options for correctLevel:
 
-`QRCode.CorrectLevel.L` for up to 7% damage
-
-`QRCode.CorrectLevel.M` for up to 15% damage
-
-`QRCode.CorrectLevel.Q` for up to 25% damage
-
-`QRCode.CorrectLevel.H` for up to 30% damage
+* `QRCode.CorrectLevel.L` for up to 7% damage
+* `QRCode.CorrectLevel.M` for up to 15% damage
+* `QRCode.CorrectLevel.Q` for up to 25% damage
+* `QRCode.CorrectLevel.H` for up to 30% damage
 
 and you can use some methods
 

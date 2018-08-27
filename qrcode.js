@@ -351,12 +351,12 @@ var QRCode;
 		 */
 		var Drawing = function (el, htOption) {
     		this._bIsPainted = false;
-    		this._android = _getAndroid();
-
+			this._android = _getAndroid();
+			
 			this._htOption = htOption;
 			this._elCanvas = document.createElement("canvas");
-			this._elCanvas.width = htOption.width + htOption.border * 2;
-			this._elCanvas.height = htOption.height + htOption.border * 2;
+			this._elCanvas.width = htOption.width + (htOption.border * 2);
+			this._elCanvas.height = htOption.height + (htOption.border * 2);
 			this._elCanvas.style.backgroundColor = htOption.colorLight;
 			el.appendChild(this._elCanvas);
 			this._el = el;
@@ -395,7 +395,7 @@ var QRCode;
 					_oContext.strokeStyle = bIsDark ? _htOption.colorDark : _htOption.colorLight;
 					_oContext.lineWidth = 1;
 					_oContext.fillStyle = bIsDark ? _htOption.colorDark : _htOption.colorLight;
-					_oContext.fillRect(nLeft+ _htOption.border, nTop+ _htOption.border, nWidth, nHeight);
+					_oContext.fillRect(nLeft + _htOption.border, nTop + _htOption.border, nWidth, nHeight);
 
 					// 안티 앨리어싱 방지 처리
 					_oContext.strokeRect(
@@ -544,7 +544,7 @@ var QRCode;
 			colorDark : "#000000",
 			colorLight : "#ffffff",
 			correctLevel : QRErrorCorrectLevel.H,
-			border: 25,
+			border: 0,
 			hasBg: true
 		};
 
