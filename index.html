@@ -15,8 +15,10 @@
 var qrcode = new QRCode(document.getElementById("qrcode"), {
 	width: 100,
 	height: 100,
-	border: 2,
-	qualityRatio: 3.125
+	border: 2, // default 0
+	inputMode: QRCode.InputMode.MODE_8BIT_BYTE, // default
+	correctLevel: QRCode.CorrectLevel.M, // default
+	qualityRatio: 3.125 // default 1
 });
 
 function makeCode () {		
