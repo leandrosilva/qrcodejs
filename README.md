@@ -22,18 +22,28 @@ var qrcode = new QRCode(document.getElementById("qrcode"), {
 	boder: 1,
 	colorDark : "#000000",
 	colorLight : "#ffffff",
-	correctLevel : QRCode.CorrectLevel.H
+	inputMode: QRCode.InputMode.MODE_ALPHA_NUM,
+	correctLevel : QRCode.CorrectLevel.H,
+	qualityRatio: 3.125
 });
 </script>
 ```
-Available options for correctLevel:
+Available options for `inputMode` are
+
+* `QRCode.InputMode.MODE_NUMBER`
+* `QRCode.InputMode.MODE_ALPHA_NUM`
+* `QRCode.InputMode.MODE_8BIT_BYTE` (default)
+
+For `correctLevel` are
 
 * `QRCode.CorrectLevel.L` for up to 7% damage
-* `QRCode.CorrectLevel.M` for up to 15% damage
+* `QRCode.CorrectLevel.M` for up to 15% damage (default)
 * `QRCode.CorrectLevel.Q` for up to 25% damage
 * `QRCode.CorrectLevel.H` for up to 30% damage
 
-and you can use some methods
+And you might have to play with `qualityRatio` when working with PDF files, e.g. 96 DPI (screen) to 300 DPI (professional printing) is a 3.125 quality ratio. Default is 1.
+
+Additionally, you can use some methods
 
 ```
 qrcode.clear(); // clear the code.
