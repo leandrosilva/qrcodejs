@@ -2,11 +2,14 @@
  * @fileoverview
  * - Using the 'QRCode for Javascript library'
  * - Fixed dataset of 'QRCode for Javascript library' for support full-spec.
- * - this library has no dependencies.
+ * - This library has no dependencies.
  *
  * @author davidshimjs
  * @see <a href="http://www.d-project.com/" target="_blank">http://www.d-project.com/</a>
  * @see <a href="http://jeromeetienne.github.com/jquery-qrcode/" target="_blank">http://jeromeetienne.github.com/jquery-qrcode/</a>
+ *
+ * @author leandrosilva
+ * @see <a href="https://github.com/leandrosilva/qrcodejs/" target="_blank">https://github.com/leandrosilva/qrcodejs/</a>
  */
 var QRCode;
 
@@ -14,9 +17,8 @@ var QRCode;
 	//---------------------------------------------------------------------
 	// QRCode for JavaScript
 	//
-	// Copyright (c) 2009 Kazuhiko Arase
-	//
-	// URL: http://www.d-project.com/
+	// Copyright (c) 2009 Kazuhiko Arase, URL: http://www.d-project.com/
+	// Copyright (c) 2019 Leandro Silva, URL: https://github.com/leandrosilva
 	//
 	// Licensed under the MIT license:
 	//   http://www.opensource.org/licenses/mit-license.php
@@ -75,6 +77,88 @@ var QRCode;
 		}
 	};
 
+	function QRAlphanumeric(data) {
+		this.mode = QRMode.MODE_ALPHA_NUM;
+		this.data = data;
+	}
+
+	QRAlphanumeric.prototype = {
+		getCode: function (code) {
+			var codes = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+			var index = codes.indexOf(code);
+			if (index < 0) {
+				throw new Error("Invalid character: `" + code + "`");
+			}
+			return index;
+		},
+		getLength: function (buffer) {
+			return this.data.length;
+		},
+		write: function (buffer) {
+			for (var i = 0; i < this.data.length; i++) {
+				if (this.data[i + 1]) {
+					buffer.put((45 * this.getCode(this.data[i])) + this.getCode(this.data[i + 1]), 11);
+				} else {
+					buffer.put(this.getCode(this.data[i]), 6);
+				}
+				i++;
+			}
+		}
+	};
+
+	function QRNumber(data) {
+		this.mode = QRMode.MODE_NUMBER;
+		this.data = data;
+	}
+
+	QRNumber.prototype = {
+		getCode: function (chars) {
+			var index = parseInt(chars, 10);
+			if (isNaN(index)) {
+				throw new Error("Invalid character: `" + chars + "`");
+			}
+			return index;
+		},
+		getBitLen: function (length) {
+			var NUMBER_LENGTH = {
+				3: 10,
+				2: 7,
+				1: 4
+			};
+			return NUMBER_LENGTH[length];
+		},
+		getLength: function (buffer) {
+			return this.data.length;
+		},
+		write: function (buffer) {
+			for (var i = 0; i < this.data.length; i++) {
+				var chars = this.data[i];
+				if (this.data[i + 1]) {
+					chars += this.data[i + 1];
+				}
+				if (this.data[i + 2]) {
+					chars += this.data[i + 2];
+				}			
+				var bitLength = this.getBitLen(chars.length);
+				buffer.put(this.getCode(chars), bitLength);			
+				i++;
+				i++;
+			}
+		}
+	};
+
+	function wrapQRData(data, inputMode) {
+		var newData;
+		if (inputMode === QRMode.MODE_NUMBER) {
+			newData = new QRNumber(data);
+		} else if (inputMode === QRMode.MODE_ALPHA_NUM) {
+			newData = new QRAlphanumeric(data);
+		} else {
+			newData = new QR8bitByte(data);
+		}
+		return newData;
+	}
+
 	function QRCodeModel(typeNumber, errorCorrectLevel) {
 		this.typeNumber = typeNumber;
 		this.errorCorrectLevel = errorCorrectLevel;
@@ -86,8 +170,7 @@ var QRCode;
 
 	QRCodeModel.prototype = {
 		addData: function(data) {
-			var newData = new QR8bitByte(data);
-			this.dataList.push(newData);
+			this.dataList.push(data);
 			this.dataCache = null;
 		},
 		isDark: function(row, col) {
@@ -1342,6 +1425,7 @@ var QRCode;
 	 * @param {Number} [vOption.height=256]
 	 * @param {String} [vOption.colorDark="#000000"]
 	 * @param {String} [vOption.colorLight="#ffffff"]
+	 * @param {String} [vOption.inputMode=QRCode.InputMode] [MODE_8BIT_BYTE|MODE_NUMBER|MODE_ALPHA_NUM]
 	 * @param {QRCode.CorrectLevel} [vOption.correctLevel=QRCode.CorrectLevel.H] [L|M|Q|H]
 	 */
 	QRCode = function (el, vOption) {
@@ -1351,6 +1435,7 @@ var QRCode;
 			typeNumber : 4,
 			colorDark : "#000000",
 			colorLight : "#ffffff",
+			inputMode: QRMode.MODE_8BIT_BYTE,
 			correctLevel : QRErrorCorrectLevel.H,
 			border: 0,
 			qualityRatio: 1,
@@ -1400,7 +1485,7 @@ var QRCode;
 	 */
 	QRCode.prototype.makeCode = function (sText) {
 		this._oQRCode = new QRCodeModel(_getTypeNumber(sText, this._htOption.correctLevel), this._htOption.correctLevel);
-		this._oQRCode.addData(sText);
+		this._oQRCode.addData(wrapQRData(sText, this._htOption.inputMode));
 		this._oQRCode.make();
 		this._el.title = sText;
 		this._oDrawing.draw(this._oQRCode);
@@ -1431,4 +1516,9 @@ var QRCode;
 	 * @name QRCode.CorrectLevel
 	 */
 	QRCode.CorrectLevel = QRErrorCorrectLevel;
+
+	/**
+	 * @name QRCode.InputMode
+	 */
+	QRCode.InputMode = QRMode;
 })();
